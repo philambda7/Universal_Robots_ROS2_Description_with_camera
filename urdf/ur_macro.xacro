@@ -460,5 +460,62 @@
       <child link="${tf_prefix}tool0"/>
     </joint>
 
+    <material name="black">
+        <color rgba="0.1 0.1 0.1 1"/>
+    </material>
+
+    <xacro:property name="camera_width" value="0.169"/>
+    <xacro:property name="camera_height" value="0.056"/>
+    <xacro:property name="camera_length" value="0.122 "/>
+    <xacro:property name="camera_2_wrist_center_dist" value="0.08 "/>
+
+    <joint name="camera_joint" type ="fixed">
+        <parent link="${tf_prefix}wrist_3_link"/>
+        <child link="camera_link"/>
+        <origin xyz = "0 -${camera_2_wrist_center_dist} 0" rpy="0 0 0"/>
+    </joint>
+    <link name="camera_link">
+      <visual>
+        <geometry>
+          <box size = "${camera_width} ${camera_height} ${camera_length}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+    </link>
+
+    <joint name="camera_optical_joint" type ="fixed">
+        <parent link="camera_link"/>
+        <child link="camera_link_optical"/>
+        <origin xyz = "0 0 ${camera_length/1.5}" rpy = "${pi/2.0} 0 0" />
+    </joint>
+
+    <link name="camera_link_optical"></link>
+
+    <gazebo reference="camera_link_optical">
+        <material>Gazebo/'Black'</material>
+        <sensor name = "camera" type ="depth">
+            <pose> 0 0 0 0 0 0 </pose>
+            <visualize>true</visualize>
+            <update_rate>10</update_rate>
+            <camera>
+                <!-- <horizontal_fov>1.089</horizontal_fov> -->
+                <horizontal_fov>1.25</horizontal_fov>
+                <vertical_fov>1.25</vertical_fov>
+                <image>
+                    <fromat>B8G8R8</fromat>
+                    <width>640</width>
+                    <height>480</height>
+                </image>
+                <clip>
+                    <near>0.05</near>
+                    <far>8.0</far>
+                </clip>
+            </camera>
+            <plugin name = "camera_controller" filename = "libgazebo_ros_camera.so">
+                <frame_name>camera_link_optical</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
+
   </xacro:macro>
 </robot>
